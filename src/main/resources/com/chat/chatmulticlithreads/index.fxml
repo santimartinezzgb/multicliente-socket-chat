@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
+
+<HBox alignment="CENTER" spacing="0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.chat.chatmulticlithreads.MainController"
+      stylesheets="@styles.css">
+    
+    <!-- Panel Izquierdo: Gestión de Clientes -->
+    <VBox fx:id="panel_control" minWidth="300" maxWidth="300" spacing="15">
+
+        <HBox spacing="10" alignment="CENTER">
+            <Label text="GESTIÓN DE CLIENTES" styleClass="titulo_control"/>
+            <Button fx:id="boton_reiniciar" text="↺ "/>
+        </HBox>
+        
+        <VBox spacing="8">
+            <Label text="Nombre del nuevo cliente:" styleClass="label_campo"/>
+            <HBox spacing="10">
+                <TextField fx:id="input_nuevo_nombre" promptText="Apodo..." HBox.hgrow="ALWAYS" onAction="#conectarNuevoCliente"/>
+                <Button fx:id="button_conectar" text="+" onAction="#conectarNuevoCliente"/>
+            </HBox>
+        </VBox>
+
+        <Separator/>
+        
+        <Label text="Clientes Conectados" styleClass="label_conectados"/>
+        
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" styleClass="panel_scroll">
+            <VBox fx:id="lista_clientes" spacing="10">
+                <!-- Tarjetas de control de clientes se añadirán aquí -->
+            </VBox>
+        </ScrollPane>
+    </VBox>
+
+    <!-- PANEL DERECHO: Chat General -->
+    <VBox fx:id="panel_chat_general" HBox.hgrow="ALWAYS" spacing="0">
+        <HBox fx:id="contenedor_chat_encabezado" alignment="CENTER_LEFT">
+            <Label fx:id="label_titulo_chat" text="Sala General" />
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="label_estado_conexion" text="● Servidor en línea" />
+        </HBox>
+
+        <ScrollPane fx:id="chat" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+            <VBox fx:id="contenedor_chat_cuerpo" spacing="10">
+                <!-- Los mensajes se cargarán dinámicamente -->
+            </VBox>
+        </ScrollPane>
+    </VBox>
+</HBox>
