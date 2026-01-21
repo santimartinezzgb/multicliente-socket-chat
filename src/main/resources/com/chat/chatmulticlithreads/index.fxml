@@ -15,13 +15,11 @@
       spacing="0">
     
     <!-- Encabezado del Chat -->
-    <HBox fx:id="contenedor_chat_encabezado" alignment="CENTER_LEFT" spacing="10" styleClass="chat_header">
+    <HBox fx:id="contenedor_chat_encabezado" alignment="CENTER_LEFT" spacing="10">
         <padding>
             <Insets top="15" right="15" bottom="15" left="15"/>
         </padding>
         <Label fx:id="label_titulo_chat" text="Chat General" styleClass="chat_title"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label fx:id="label_estado_conexion" text="● En línea" styleClass="status_label"/>
     </HBox>
 
     <!-- Área de Mensajes -->

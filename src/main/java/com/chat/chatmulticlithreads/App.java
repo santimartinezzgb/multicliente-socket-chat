@@ -23,7 +23,6 @@ public class App extends Application {
 
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Chat");
-        dialog.setHeaderText("¿Cómo te llamas?");
         dialog.setContentText("Tu nombre:");
 
         String nombre = dialog.showAndWait().orElse("").trim();
@@ -32,13 +31,14 @@ public class App extends Application {
         }
 
         FXMLLoader loader = new FXMLLoader(App.class.getResource("index.fxml"));
-        Scene scene = new Scene(loader.load(), 380, 650);
+        Scene scene = new Scene(loader.load(), 360, 640);
         MainController controller = loader.getController();
         controller.setNombreCliente(nombre);
         controller.conectarAlServidor();
 
         stage.setTitle(nombre);
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.setOnCloseRequest(e -> controller.desconectar());
         stage.show();
     }

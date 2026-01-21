@@ -1,13 +1,26 @@
 .root {
+    -fx-color-primario: #2481cc;
+    -fx-color-secundario: #1e6fb3;
+    -fx-color-terciario: #186099;
+    -fx-color-fondo: #f0f2f5;
+    -fx-color-mensaje-enviado: #eeffde;
+    -fx-color-mensaje-recibido: #ffffff;
+    -fx-color-mensaje-info: #e3f2fd;
+    -fx-color-mensaje-info-texto: #5c6d7e;
+
+    -fx-color-negro: #000000;
+}
+
+.root {
     -fx-font-family: "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
     -fx-font-size: 14px;
     -fx-background-color: #f0f2f5;
 }
 
 /* ========== ENCABEZADO DEL CHAT ========== */
-.chat_header {
-    -fx-background-color: #075e54;
-    -fx-border-color: #064e47;
+#contenedor_chat_encabezado {
+    -fx-background-color: -fx-color-primario;
+    -fx-border-color: -fx-color-primario;
     -fx-border-width: 0 0 1 0;
 }
 
@@ -18,47 +31,58 @@
 }
 
 .status_label {
-    -fx-text-fill: #a8e6cf;
+    -fx-text-fill: -fx-color-mensaje-info-texto;
     -fx-font-size: 12px;
 }
 
 /* ========== ÁREA DE MENSAJES ========== */
 .chat_scroll {
-    -fx-background-color: #e5ddd5;
+    -fx-background-color: -fx-color-fondo;
 }
 
 .chat_scroll .viewport {
-    -fx-background-color: #e5ddd5;
+    -fx-background-color: -fx-color-fondo;
+}
+
+.chat_scroll .scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.chat_scroll .scroll-bar .thumb {
+    -fx-background-color: -fx-color-negro;
+    -fx-background-radius: 5;
+}
+
+.chat_scroll .scroll-bar .track {
+    -fx-background-color: transparent;
 }
 
 #contenedor_chat_cuerpo {
-    -fx-background-color: #e5ddd5;
+    -fx-background-color: -fx-color-fondo;
 }
 
 /* ========== ESTILOS DE MENSAJES ========== */
 .mensaje {
     -fx-padding: 8 12;
     -fx-background-radius: 8;
-    -fx-max-width: 300;
+    -fx-max-width: 250;
     -fx-wrap-text: true;
     -fx-font-size: 14px;
 }
 
 .mensaje_enviado {
-    -fx-background-color: #dcf8c6;
-    -fx-text-fill: #303030;
-    -fx-alignment: center-right;
+    -fx-background-color: -fx-color-mensaje-enviado;
+    -fx-text-fill: -fx-color-negro;
 }
 
 .mensaje_recibido {
-    -fx-background-color: #ffffff;
-    -fx-text-fill: #303030;
-    -fx-alignment: center-left;
+    -fx-background-color: -fx-color-mensaje-recibido;
+    -fx-text-fill: -fx-color-negro;
 }
 
 .mensaje_info {
-    -fx-background-color: #fff4ce;
-    -fx-text-fill: #6b6b6b;
+    -fx-background-color: -fx-color-mensaje-info;
+    -fx-text-fill: -fx-color-mensaje-info-texto;
     -fx-font-size: 12px;
     -fx-font-style: italic;
     -fx-alignment: center;
@@ -67,7 +91,7 @@
 
 /* ========== ÁREA DE ENTRADA ========== */
 .input_area {
-    -fx-background-color: #f0f0f0;
+    -fx-background-color: -fx-color-fondo;
     -fx-border-color: #d1d1d1;
     -fx-border-width: 1 0 0 0;
 }
@@ -82,12 +106,12 @@
 }
 
 .input_field:focused {
-    -fx-border-color: #075e54;
+    -fx-border-color: -fx-color-primario;
     -fx-border-width: 2;
 }
 
 .send_button {
-    -fx-background-color: #075e54;
+    -fx-background-color: -fx-color-primario;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 10;
@@ -97,9 +121,9 @@
 }
 
 .send_button:hover {
-    -fx-background-color: #064e47;
+    -fx-background-color: -fx-color-secundario;
 }
 
 .send_button:pressed {
-    -fx-background-color: #053d36;
+    -fx-background-color: -fx-color-terciario;
 }

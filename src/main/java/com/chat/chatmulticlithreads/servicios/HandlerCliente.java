@@ -17,10 +17,10 @@ public class HandlerCliente implements Runnable {
 
     @Override
     public void run() {
-        try (BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                PrintWriter salida = new PrintWriter(socket.getOutputStream(), true)) {
+        try {
+            BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            salida = new PrintWriter(socket.getOutputStream(), true);
 
-            this.salida = salida;
             nombre = entrada.readLine();
             if (nombre == null || nombre.isEmpty())
                 nombre = "Usuario";
@@ -32,7 +32,7 @@ public class HandlerCliente implements Runnable {
             while ((mensaje = entrada.readLine()) != null) {
                 if (mensaje.equalsIgnoreCase("salir"))
                     break;
-                Servidor.broadcast(mensaje);
+                Servidor.broadcast(nombre + ": " + mensaje);
             }
         } catch (IOException e) {
             // Cliente desconectado
