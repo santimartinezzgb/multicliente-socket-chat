@@ -32,7 +32,7 @@ public class HandlerCliente implements Runnable {
             while ((mensaje = entrada.readLine()) != null) {
                 if (mensaje.equalsIgnoreCase("salir"))
                     break;
-                Servidor.broadcast(nombre + ": " + mensaje);
+                Servidor.broadcast(nombre.toUpperCase() + ": " + mensaje);
             }
         } catch (IOException e) {
             // Cliente desconectado

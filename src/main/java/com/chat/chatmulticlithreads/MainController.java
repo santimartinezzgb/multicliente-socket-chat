@@ -1,11 +1,17 @@
 package com.chat.chatmulticlithreads;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -28,7 +34,7 @@ public class MainController {
         label_titulo_chat.setText(nombre);
     }
 
-    public void conectarAlServidor() {
+    public boolean conectarAlServidor() {
         try {
             socket = new Socket("localhost", 8080);
             salida = new PrintWriter(socket.getOutputStream(), true);
@@ -45,8 +51,9 @@ public class MainController {
                 } catch (IOException e) {
                 }
             }).start();
+            return true;
         } catch (IOException e) {
-            agregarMensaje("Error: " + e.getMessage());
+            return false;
         }
     }
 
@@ -54,7 +61,7 @@ public class MainController {
     private void enviarMensaje() {
         String msg = input_mensaje.getText().trim();
         if (!msg.isEmpty() && salida != null) {
-            salida.println("[" + nombreCliente.toUpperCase() + "]: " + msg);
+            salida.println(msg);
             agregarMensajePropio(msg);
             input_mensaje.clear();
         }
@@ -73,7 +80,7 @@ public class MainController {
     }
 
     private void agregarMensaje(String texto) {
-        if (texto.startsWith("[" + nombreCliente.toUpperCase() + "]: ")) { // Ignorar mensajes propios
+        if (texto.startsWith(nombreCliente.toUpperCase() + ": ")) { // Ignorar mensajes propios
             return;
         }
         Label label = new Label(texto); // Mensaje recibido
