@@ -1,62 +1,59 @@
-# chat-socket
+# Chat Multicliente con Sockets
 
-Chat grupal (multi-cliente) basado en **sockets + threads** en Java.
+Chat grupal en tiempo real usando **sockets + threads** en Java con interfaz **JavaFX**.
 
-## Requisito
+## Requisitos
 
-- **Java 25** (compilar y ejecutar con la misma versión). Comprueba con:
+- Java 21
+- Maven
+
+## Componentes
+
+- **Servidor**: gestiona conexiones concurrentes con pool de threads
+- **HandlerCliente**: hilo independiente por cada cliente conectado
+- **Cliente JavaFX**: interfaz gráfica con chat en tiempo real
+
+## Ejecución
+
+**Servidor:**
+- Click derecho en `LauncherServidor.java` → Run
+
+**Clientes** (en diferentes terminales o IDEs):
+- Click derecho en `Launcher.java` → Run
+- Ingresa tu nombre cuando se solicite
+
+## Compilación
 
 ```bash
-java -version
-javac -version
-```
-
-## Qué incluye
-
-- `ChatServer`: servidor multihilo con pool fijo.
-- `ClientHandler`: un hilo por cliente (vía `ExecutorService`).
-- `ChatRoom`: sala de chat (broadcast) usando estructura concurrente.
-- `ChatClient`: cliente interactivo con lectura/escritura simultánea (hilo lector + consola).
-
-## Cómo compilar
-
-```bash
-cd /home/santi/Rober/chat-socket
 javac -d out $(find src -name "*.java")
 ```
 
-## Cómo ejecutar
-
-Servidor:
-
+O con Maven:
 ```bash
-java -cp out ChatServer
-```
-
-Cliente (en otra terminal, puedes abrir 2 o más):
-
-```bash
-java -cp out ChatClient
-```
-
-Opcionalmente:
-
-```bash
-java -cp out ChatClient 127.0.0.1 8080
-```
-
-## Atajo (recomendado)
-
-Hay un script que compila y arranca el servidor con Java 25:
-
-```bash
-./run-java25.sh
+mvn clean compile
 ```
 
 ## Uso
 
-- Al entrar, el servidor pide tu nombre.
-- Escribe mensajes normales para enviarlos al grupo.
-- Comandos:
-  - `/help`
-  - `/salir` (o `salir`)
+1. Inicia el servidor (puerto 8080)
+2. Conecta clientes (puedes abrir múltiples instancias)
+3. Escribe mensajes en la interfaz
+4. Los mensajes se envían a todos los conectados
+
+
+
+## Arquitectura
+
+```
+Servidor (puerto 8080)
+  ↓
+HandlerCliente (hilo por cliente)
+  ↓
+Broadcast → Todos los clientes
+```
+
+**Flujo:**
+1. Cliente conecta y envía nombre
+2. Servidor notifica: "Usuario se ha unido"
+3. Mensajes formato: `[NOMBRE]: mensaje`
+4. Al salir: "Usuario se ha ido"
