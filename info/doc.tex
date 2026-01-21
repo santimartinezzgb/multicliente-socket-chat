@@ -1,0 +1,892 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{enumitem}
+
+% Configuración de listings para código Java
+\lstset{
+    language=Java,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=10pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    xleftmargin=17pt,
+    framexleftmargin=17pt,
+    framexrightmargin=5pt,
+    framexbottommargin=4pt
+}
+
+\begin{document}
+
+    % ========================== PORTADA ==========================
+    \begin{titlepage}
+        \centering
+
+        {\Large \textbf{Programación de Servicios y Procesos}\par}
+        
+        \vspace{2cm}
+        {\Huge \textbf{Chat Multicliente}\par}
+        \vspace{0.3cm}
+        {\LARGE Aplicacion de mensajeria grupal con Sockets y JavaFX\par}
+        
+        \vspace{2cm}
+        \noindent\rule{10cm}{0.4pt}
+        
+        \vspace{2cm}
+        {\Large \textbf{Autor:}\par}
+        \vspace{0.3cm}
+        {\large Santi Martínez\par}
+        
+        \vspace{1cm}
+        {\large \textbf{Tecnologías:}\par}
+        \vspace{0.2cm}
+        {\normalsize Java 21 | JavaFX | Sockets | Maven\par}
+        
+        \vspace{8cm}
+        {\large \today}
+        
+    \end{titlepage}
+
+    \newpage
+    \renewcommand{\contentsname}{ÍNDICE}
+    \tableofcontents
+
+    % ========================== INTRODUCCIÓN ==========================
+    \newpage
+    \section{Introducción}
+
+        Esta documentación desarrolla un \textbf{sistema de chat multicliente} implementado en Java, utilizando sockets TCP/IP para la comunicación en red y JavaFX para la interfaz gráfica de usuario.
+        
+        \vspace{0.3cm}
+        El proyecto tiene como objetivo demostrar la implementación práctica de conceptos fundamentales de programación concurrente, comunicación en red y desarrollo de interfaces gráficas, creando una aplicación funcional que permite la comunicación simultánea entre múltiples usuarios conectados a través de una red local o internet.
+
+        \subsection{Contexto del Proyecto}
+
+            En el ámbito de la programación de servicios y procesos, la comunicación cliente-servidor mediante sockets representa uno de los pilares fundamentales para el desarrollo de aplicaciones distribuidas. Este proyecto surge como respuesta a la necesidad de implementar un sistema que permita:
+
+            \begin{itemize}
+                \item La comunicación en tiempo real entre múltiples clientes
+                \item La gestión eficiente de conexiones concurrentes mediante hilos
+                \item Una interfaz de usuario intuitiva y responsiva
+                \item El manejo robusto de errores y desconexiones inesperadas
+            \end{itemize}
+
+        \subsection{Objetivos del Proyecto}
+
+            Los objetivos específicos que se persiguen con este desarrollo son:
+
+            \begin{enumerate}
+                \item \textbf{Implementar un servidor multihilo} capaz de gestionar conexiones simultáneas de múltiples clientes
+                \item \textbf{Desarrollar un cliente con interfaz gráfica} utilizando JavaFX que permita una experiencia de usuario fluida
+                \item \textbf{Gestionar la comunicación} mediante sockets TCP/IP, asegurando la transmisión fiable de mensajes
+                \item \textbf{Aplicar conceptos de programación concurrente} para garantizar la sincronización correcta entre hilos
+                \item \textbf{Implementar un sistema de difusión} (broadcast) que permita enviar mensajes a todos los clientes conectados
+                \item \textbf{Manejar eventos de conexión y desconexión} de forma transparente para los usuarios
+            \end{enumerate}
+
+        \subsection{Tecnologías Utilizadas}
+
+            El proyecto se desarrolla sobre las siguientes tecnologías y herramientas:
+
+            \begin{itemize}
+                \item \textbf{Java 21}: Version LTS del lenguaje, aprovechando las ultimas caracteristicas y mejoras de rendimiento
+                \item \textbf{JavaFX 21.0.6}: Framework para desarrollo de interfaces graficas modernas y responsivas
+                \item \textbf{Maven}: Herramienta de gestion de dependencias y construccion del proyecto
+                \item \textbf{Sockets TCP/IP}: API de Java para comunicacion en red
+                \item \textbf{Threads y Concurrencia}: ExecutorService, ConcurrentHashMap para gestion de hilos
+            \end{itemize}
+
+        \subsection{Estructura de la Documentación}
+
+            Este documento se organiza en las siguientes secciones:
+
+            \begin{itemize}
+                \item \textbf{Arquitectura del Sistema}: Descripción general de la estructura y componentes principales
+                \item \textbf{Implementación del Servidor}: Análisis detallado del componente servidor y gestión de clientes
+                \item \textbf{Implementación del Cliente}: Desarrollo del cliente con interfaz gráfica
+                \item \textbf{Protocolo de Comunicación}: Protocolo de mensajes y flujo de información
+                \item \textbf{Interfaz de Usuario}: Diseño y funcionalidades de la GUI con JavaFX
+                \item \textbf{Problemas y Soluciones}: Dificultades encontradas durante el desarrollo
+                \item \textbf{Conclusiones}: Reflexiones finales y aprendizajes del proyecto
+            \end{itemize}
+
+    % ========================== ARQUITECTURA ==========================
+    \newpage
+    \section{Arquitectura del Sistema}
+
+        La aplicación de chat multicliente sigue una arquitectura cliente-servidor clásica, donde un servidor central gestiona las conexiones y redistribuye los mensajes entre todos los clientes conectados.
+
+        \subsection{Visión General}
+
+            El sistema se compone de los siguientes elementos principales:
+
+            \begin{itemize}
+                \item \textbf{Servidor Central}: Acepta conexiones entrantes, crea un hilo para cada cliente y gestiona la difusión de mensajes
+                \item \textbf{Clientes JavaFX}: Aplicaciones con interfaz gráfica que se conectan al servidor
+                \item \textbf{Protocolo de Comunicación}: Basado en líneas de texto sobre sockets TCP/IP
+                \item \textbf{Sistema de Broadcast}: Mecanismo para enviar mensajes a todos los clientes simultáneamente
+            \end{itemize}
+
+        \subsection{Estructura de Paquetes}
+
+            El proyecto está organizado en paquetes siguiendo principios de separación de responsabilidades:
+
+            \begin{itemize}
+                \item \textbf{com.chat.chatmulticlithreads.servicios}: Contiene las clases relacionadas con el servidor y la gestión de clientes (\textbf{Servidor}, \textbf{HandlerCliente})
+                \item \textbf{com.chat.chatmulticlithreads.cliente}: Incluye las clases del cliente JavaFX (\textbf{App}, \textbf{MainController}, \textbf{Launcher})
+                \item \textbf{resources}: Archivos de recursos como FXML y CSS para la interfaz gráfica
+                \item \textbf{pom.xml}: Archivo de configuración de Maven con dependencias y plugins
+            
+            \end{itemize}
+
+        \subsection{Diagrama de Componentes}
+
+            El siguiente diagrama ilustra la relación entre los componentes principales:
+
+            \begin{figure}[htb]
+                \centering
+                \begin{tcolorbox}[width=0.9\textwidth, colback=white]
+                    \small
+                    \textbf{Cliente 1 (JavaFX)} $\longleftrightarrow$ \textbf{HandlerCliente 1}
+                    
+                    \vspace{0.3cm}
+                    \textbf{Cliente 2 (JavaFX)} $\longleftrightarrow$ \textbf{HandlerCliente 2} $\longleftrightarrow$ \textbf{Servidor}
+                    
+                    \vspace{0.3cm}
+                    \textbf{Cliente N (JavaFX)} $\longleftrightarrow$ \textbf{HandlerCliente N}
+                \end{tcolorbox}
+                \caption{Arquitectura Cliente-Servidor del Chat}
+            \end{figure}
+
+        \subsection{Principios de Diseño Aplicados}
+
+            \subsubsection{Separación de Responsabilidades}
+            
+            Cada clase tiene una responsabilidad única y bien definida:
+            \begin{itemize}
+                \item \textbf{Servidor}: Aceptar conexiones y coordinar broadcast
+                \item \textbf{HandlerCliente}: Gestionar comunicación con un cliente específico
+                \item \textbf{App}: Inicializar interfaz gráfica y conectar al servidor
+                \item \textbf{MainController}: Controlar eventos de UI y mostrar mensajes
+            \end{itemize}
+
+            \subsubsection{Concurrencia Controlada}
+            
+            El manejo de múltiples clientes simultáneos se realiza mediante:
+            \begin{itemize}
+                \item \textbf{ExecutorService} con pool de hilos cacheados
+                \item \textbf{ConcurrentHashMap.newKeySet()} para almacenar clientes de forma thread-safe
+                \item Sincronización automática en operaciones de broadcast
+            \end{itemize}
+
+            \subsubsection{Modularidad}
+            
+            La separación entre lógica de red y presentación permite:
+            \begin{itemize}
+                \item Probar el servidor independientemente de la interfaz
+                \item Reemplazar la GUI sin modificar la lógica de red
+                \item Extender funcionalidades sin afectar componentes existentes
+            \end{itemize}
+
+    % ========================== SERVIDOR ==========================
+    \newpage
+    \section{Implementación del Servidor}
+
+        El servidor es el componente central que coordina toda la comunicación entre clientes. Su responsabilidad principal es aceptar conexiones entrantes y gestionar el envío de mensajes entre todos los participantes.
+
+        \subsection{Clase Servidor}
+
+            La clase \textbf{Servidor} implementa el socket servidor que escucha en un puerto específico y crea un nuevo \textbf{HandlerCliente} para cada conexión entrante.
+            \vspace{0.3cm}
+
+            \begin{lstlisting}[caption={Implementación de la clase Servidor}]
+public class Servidor {
+    private static final int PUERTO = 8080;
+    public static final Set<HandlerCliente> clientes = 
+        ConcurrentHashMap.newKeySet();
+
+    public static void main(String[] args) {
+        ExecutorService pool = Executors.newCachedThreadPool();
+        System.out.println("Servidor iniciado en puerto " + PUERTO);
+
+        try (ServerSocket serverSocket = new ServerSocket(PUERTO)) {
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("Cliente conectado: " + 
+                    socket.getInetAddress());
+                pool.execute(new HandlerCliente(socket));
+            }
+        } catch (IOException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+
+    public static void broadcast(String mensaje) {
+        clientes.forEach(c -> c.enviar(mensaje));
+    }
+}
+            \end{lstlisting}
+        \newpage
+        \subsection{Características del Servidor}
+
+            \subsubsection{Puerto de Escucha}
+            
+            El servidor escucha en el puerto \textbf{8080}. Esta es una constante que puede modificarse según las necesidades de despliegue.
+
+            \subsubsection{Gestión de Clientes}
+            
+            Se utiliza un \textbf{ConcurrentHashMap.newKeySet()} para almacenar los manejadores de clientes activos. Esta estructura de datos es thread-safe y permite operaciones concurrentes sin necesidad de sincronización explícita.
+
+            \subsubsection{Pool de Hilos}
+            
+            El servidor utiliza un \textbf{ExecutorService} con \textbf{newCachedThreadPool()}, que crea hilos según sea necesario y reutiliza hilos inactivos, optimizando el uso de recursos.
+
+            \subsubsection{Método Broadcast}
+            
+            El método \textbf{broadcast()} es estático y puede ser invocado desde cualquier \textbf{HandlerCliente} para enviar un mensaje a todos los clientes conectados simultáneamente.
+
+        \newpage
+        \subsection{Clase HandlerCliente}
+
+            Cada cliente conectado es gestionado por una instancia de \textbf{HandlerCliente}, que se ejecuta en su propio hilo.
+
+            \begin{lstlisting}[caption={Implementación de HandlerCliente}]
+public class HandlerCliente implements Runnable {
+    private final Socket socket;
+    private PrintWriter salida;
+    private String nombre;
+    public HandlerCliente(Socket socket) {
+        this.socket = socket;
+    }
+
+    @Override
+    public void run() {
+        try {
+            BufferedReader entrada = new BufferedReader(
+                new InputStreamReader(socket.getInputStream()));
+            salida = new PrintWriter(socket.getOutputStream(), true);
+
+            nombre = entrada.readLine();
+            if (nombre == null || nombre.isEmpty()) nombre = "Usuario";
+
+            Servidor.clientes.add(this);
+            Servidor.broadcast(nombre + " se ha unido");
+
+            String mensaje;
+            while ((mensaje = entrada.readLine()) != null) {
+                if (mensaje.equalsIgnoreCase("salir"))
+                    break;
+                Servidor.broadcast(mensaje);
+            }
+        } catch (IOException e) {
+            // Cliente desconectado
+        } finally {
+            Servidor.clientes.remove(this);
+            if (nombre != null) Servidor.broadcast(nombre + " se ha ido");
+            try {socket.close();} catch (IOException ignored) {}
+        }
+    }
+    public void enviar(String mensaje) {
+        if (salida != null)
+            salida.println(mensaje);
+    }
+}
+            \end{lstlisting}
+
+        \subsection{Ciclo de Vida de una Conexión}
+
+            \begin{enumerate}
+                \item \textbf{Aceptación}: El servidor acepta la conexión y se abre en el puerto 8080.
+                \item \textbf{Creación}: Se instancia un \textbf{Cliente} con el socket.
+                \item \textbf{Registro}: El cliente se añade al conjunto de clientes activos
+                \item \textbf{Anuncio}: Se notifica a todos que el cliente se ha unido
+                \item \textbf{Escucha}: Se entra en un bucle para recibir mensajes
+                \item \textbf{Broadcast}: Cada mensaje recibido se reenvía a todos
+                \item \textbf{Desconexión}: Al cerrar, se elimina del conjunto y se notifica en el chat general.
+            \end{enumerate}
+
+    % ========================== CLIENTE ==========================
+    \newpage
+    \section{Implementación del Cliente}
+
+        El cliente es una aplicación JavaFX que proporciona una interfaz gráfica intuitiva para conectarse al servidor y participar en el chat.
+
+        \subsection{Clase App}
+
+            La clase \textbf{App} es el punto de entrada de la aplicación JavaFX y gestiona el ciclo de vida de la interfaz gráfica.
+
+
+        \subsection{Características del Cliente}
+
+            \subsubsection{Separación Servidor-Cliente}
+            
+            El servidor y los clientes ahora están completamente separados, lo que permite un control más preciso sobre su ejecución. Existen dos launchers independientes:
+            
+            \begin{itemize}
+                \item \textbf{LauncherServidor.java}: Inicia únicamente el servidor en el puerto 8080
+                \item \textbf{Launcher.java}: Inicia instancias de clientes que se conectan al servidor
+            \end{itemize}
+            
+            Esta arquitectura permite:
+            \begin{itemize}
+                \item Ejecutar el servidor en una máquina dedicada
+                \item Conectar clientes desde diferentes dispositivos en la red
+                \item Mejor control y depuración del servidor y clientes por separado
+                \item Reiniciar clientes sin afectar al servidor o viceversa
+            \end{itemize}
+
+            \subsubsection{Validación de Conexión}
+            
+            El cliente verifica que el servidor esté disponible antes de abrir la interfaz gráfica. Si no puede establecer conexión, muestra un mensaje de error informando al usuario que debe iniciar primero el servidor.
+
+            \subsubsection{Diálogo de Identificación}
+            
+            Al iniciar, se solicita al usuario que introduzca su nombre mediante un \textbf{TextInputDialog}. Este nombre se envía al servidor como primer mensaje y se utiliza para identificar los mensajes del usuario.
+
+            \subsubsection{Carga de la Interfaz}
+            
+            La interfaz se carga desde un archivo FXML (\textbf{index.fxml}), lo que separa la estructura de la UI del código lógico y facilita el diseño visual.
+
+        \subsection{Clase MainController}
+
+            El controlador gestiona todos los eventos de la interfaz y la comunicación con el servidor.
+
+            \begin{lstlisting}[caption={MainController - Variables y métodos principales}]
+public class MainController {
+    @FXML
+    private VBox contenedor_chat_cuerpo;
+    @FXML
+    private TextField input_mensaje;
+    @FXML
+    private ScrollPane chat;
+    @FXML
+    private Label label_titulo_chat;
+    private Socket socket;
+    private PrintWriter salida;
+    private String nombreCliente;
+    public void setNombreCliente(String nombre) {
+        this.nombreCliente = nombre;
+        label_titulo_chat.setText(nombre);
+    }
+
+    public void conectarAlServidor() {
+        try {
+            socket = new Socket("localhost", 8080);
+            salida = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader entrada = new BufferedReader(
+                new InputStreamReader(socket.getInputStream()));
+            salida.println(nombreCliente);
+
+            new Thread(() -> {
+                try {
+                    String msg;
+                    while ((msg = entrada.readLine()) != null) {
+                        String m = msg;
+                        Platform.runLater(() -> agregarMensaje(m));
+                    }
+                } catch (IOException e) {
+                }
+            }).start();
+        } catch (IOException e) { agregarMensaje("Error: " + e.getMessage());}
+    }
+}
+            \end{lstlisting}
+
+        \subsection{Gestión de Mensajes}
+
+            \subsubsection{Envío de Mensajes}
+            
+            Cuando el usuario presiona Enter o hace clic en el botón de enviar, se ejecuta el método \textbf{enviarMensaje()}:
+
+            \vspace{0.3cm}
+            \begin{lstlisting}[caption={Método de envío de mensajes}]
+@FXML
+private void enviarMensaje() {
+    String msg = input_mensaje.getText().trim();
+    if (!msg.isEmpty() && salida != null) {
+        salida.println("[" + nombreCliente.toUpperCase() + "]: " + msg);
+        agregarMensajePropio(msg);
+        input_mensaje.clear();
+    }
+}
+            \end{lstlisting}
+
+            \subsubsection{Recepción de Mensajes}
+            
+            Un hilo separado escucha continuamente los mensajes entrantes del servidor. Para actualizar la interfaz de forma segura, se utiliza \textbf{Platform.runLater()}:
+
+            \vspace{0.3cm}
+            \begin{lstlisting}[caption={Recepción asíncrona de mensajes}]
+new Thread(() -> {
+    try {
+        String msg;
+        while ((msg = entrada.readLine()) != null) {
+            String m = msg;
+            Platform.runLater(() -> agregarMensaje(m));
+        }
+    } catch (IOException e) {
+    }
+}).start();
+            \end{lstlisting}
+
+    % ========================== PROTOCOLO ==========================
+    \newpage
+    \section{Protocolo de Comunicación}
+
+        El protocolo implementado es simple pero efectivo, basado en el intercambio de líneas de texto sobre sockets TCP/IP.
+
+        \subsection{Formato de Mensajes}
+
+            Los mensajes siguen una estructura específica:
+
+            \begin{itemize}
+                \item \textbf{Identificación}: Primera línea enviada por el cliente contiene el nombre de usuario
+                \item \textbf{Mensajes de chat}: Formato \textbf{[NOMBRE]: contenido del mensaje}
+                \item \textbf{Notificaciones}: \textbf{Usuario se ha unido} o \textbf{Usuario se ha ido}
+                \item \textbf{Comando de salida}: \textbf{Salir} para cerrar la conexión
+            \end{itemize}
+
+        \subsection{Flujo de Comunicación}
+
+            \begin{enumerate}
+                \item Cliente se conecta al servidor en el puerto 8080
+                \item Cliente envía su nombre como primera línea
+                \item Servidor añade el cliente al conjunto de participantes
+                \item Servidor notifica a todos: \textbf{Usuario se ha unido}
+                \item Cliente puede enviar mensajes que se redistribuyen a todos
+                \item Al cerrar, servidor notifica: \textbf{Usuario se ha ido}
+            \end{enumerate}
+
+        \subsection{Diagrama de Secuencia}
+
+            \begin{figure}[htb]
+                \centering
+                \begin{tcolorbox}[width=\textwidth, colback=white]
+                    \small
+                    \textbf{Cliente} $\rightarrow$ \textbf{Servidor}: Conexión
+                    
+                    \textbf{Cliente} $\rightarrow$ \textbf{Servidor}: ``Juan''
+                    
+                    \textbf{Servidor} $\rightarrow$ \textbf{Todos}: ``Juan se ha unido''
+                    
+                    \textbf{Cliente} $\rightarrow$ \textbf{Servidor}: ``[JUAN]: Hola a todos''
+                    
+                    \textbf{Servidor} $\rightarrow$ \textbf{Todos}: ``[JUAN]: Hola a todos''
+                    
+                    \textbf{Cliente} $\rightarrow$ \textbf{Servidor}: ``salir''
+                    
+                    \textbf{Servidor} $\rightarrow$ \textbf{Todos}: ``Juan se ha ido''
+                \end{tcolorbox}
+                \caption{Secuencia de comunicación}
+            \end{figure}
+
+    % ========================== INTERFAZ ==========================
+    \newpage
+    \section{Interfaz de Usuario}
+
+        La interfaz gráfica está diseñada para ser simple e intuitiva, proporcionando una experiencia de chat similar a aplicaciones de mensajería modernas.
+
+        \vspace{0.3cm}
+        En primera instancia, se solicita al usuario su nombre de usuario:
+
+        \begin{figure}[!htb]
+            \centering
+            \includegraphics[width=0.3\textwidth]{images/introducir-nombre.png}
+        \end{figure}
+
+        Al introducir un nombre, se muestra la ventana principal del chat, en la que aparece el mensaje de bienvenida.
+
+        \begin{figure}[!htb]
+            \centering
+            \includegraphics[width=0.5\textwidth]{images/inicio.png}
+            \caption{Interfaz de inicio del cliente}
+        \end{figure}
+
+        \newpage
+        Múltiples usuarios pueden conectarse simultáneamente y ver los mensajes en tiempo real. La representación visual distingue entre mensajes propios y de otros usuarios, además de notificar las entradas y salidas del chat.
+        \begin{figure}[!htb]
+            \centering
+            \includegraphics[width=1\textwidth]{images/chat-simultaneo.png}
+            \caption{Dos usuarios simultáneos}
+        \end{figure}
+
+        Para abandonar el chat, el usuario puede cerrar la ventana utilizando el botón de cierre estándar de la ventana.
+        \begin{figure}[!htb]
+            \centering
+            \includegraphics[width=0.5\textwidth]{images/como-cerrar.png}
+            \caption{Botón x para cerrar}
+        \end{figure}
+
+
+        \newpage
+        Al cerrar la ventana, el cliente se desconecta del servidor y se notifica a los demás usuarios. El siguiente ejemplo muestra cómo se ve cuando un usuario sale del chat:
+        \begin{figure}[!htb]
+            \centering
+            \includegraphics[width=0.5\textwidth]{images/usuarios-salen.png}
+            \caption{Usuarios saliendo del chat}
+        \end{figure}
+
+        \newpage
+        \subsection{Componentes de la Interfaz}
+
+            La interfaz se compone de los siguientes elementos:
+
+            \begin{itemize}
+                \item \textbf{Etiqueta de titulo}: Muestra el nombre del usuario
+                \item \textbf{Area de mensajes}: ScrollPane con VBox que contiene todos los mensajes
+                \item \textbf{Campo de entrada}: TextField para escribir mensajes
+                \item \textbf{Diferenciacion visual}: Mensajes propios a la derecha, recibidos a la izquierda
+            \end{itemize}
+
+        \subsection{Archivo FXML}
+
+            La estructura de la interfaz se define en el archivo \textbf{index.fxml}, que describe la jerarquía de componentes JavaFX.
+
+        \subsection{Estilos CSS}
+
+            El archivo \textbf{styles.css} define los estilos visuales de la aplicación:
+
+            \begin{itemize}
+                \item Estilos para mensajes enviados: alineados a la derecha
+                \item Estilos para mensajes recibidos: alineados a la izquierda
+                \item Colores y tipografía coherentes
+                \item Diseño responsive que se adapta al contenido
+            \end{itemize}
+
+        \subsection{Métodos de Visualización}
+
+            \subsubsection{Agregar Mensaje Propio}
+            
+            \begin{lstlisting}[caption={Visualización de mensajes enviados}]
+private void agregarMensajePropio(String texto) {
+    Label label = new Label(texto);
+    label.setWrapText(true);
+    label.getStyleClass().add("mensaje");
+    label.getStyleClass().add("mensaje_enviado");
+
+    HBox contenedor = new HBox(label);
+    contenedor.setAlignment(Pos.CENTER_RIGHT);
+    contenedor_chat_cuerpo.getChildren().add(contenedor);
+    chat.setVvalue(1.0); // Scroll al final
+}
+            \end{lstlisting}
+
+            \subsubsection{Agregar Mensaje Recibido}
+            
+            \begin{lstlisting}[caption={Visualización de mensajes recibidos}]
+private void agregarMensaje(String texto) {
+    if (texto.startsWith("[" + nombreCliente.toUpperCase() + "]: ")) {
+        return; // Ignorar mensajes propios
+    }
+    Label label = new Label(texto);
+    label.setWrapText(true);
+    label.getStyleClass().add("mensaje");
+    label.getStyleClass().add("mensaje_recibido");
+
+    HBox contenedor = new HBox(label);
+    contenedor.setAlignment(Pos.CENTER_LEFT);
+    contenedor_chat_cuerpo.getChildren().add(contenedor);
+    chat.setVvalue(1.0);
+}
+            \end{lstlisting}
+
+    % ========================== COMPILACIÓN ==========================
+    \newpage
+    \section{Compilación y Ejecución}
+
+        El proyecto utiliza Maven como herramienta de gestión de dependencias y construcción.
+
+        \subsection{Estructura del POM}
+
+            El archivo \textbf{pom.xml} define las dependencias y plugins necesarios:
+
+            \begin{itemize}
+                \item \textbf{JavaFX Controls}: Para componentes de interfaz gráfica
+                \item \textbf{JavaFX FXML}: Para cargar archivos FXML
+                \item \textbf{Maven Compiler Plugin}: Configurado para Java 21
+                \item \textbf{JavaFX Maven Plugin}: Para ejecutar la aplicación
+            \end{itemize}
+
+        \subsection{Comandos de Ejecución}
+
+            \subsubsection{Compilar el Proyecto}
+            
+            \begin{center}
+                    \textbf{mvn clean compile}
+            \end{center}
+            
+            \subsubsection{Ejecutar el Servidor}
+            
+            Primero, es necesario iniciar el servidor. Este se inicia con click derecho en \textbf{LauncherServidor}.java y seleccionar Run Java.
+
+            \subsubsection{Ejecutar Clientes}
+            
+            Una vez el servidor está en ejecución, se pueden iniciar múltiples clientes:
+            
+            \begin{center}
+                       \textbf{mvn javafx:run}
+            \end{center}
+            
+            O ejecutar directamente la clase \textbf{Launcher.java} desde el IDE.
+
+            \subsubsection{Ejecutar Múltiples Instancias}
+            
+            Para probar el chat con varios usuarios, se pueden ejecutar múltiples instancias del cliente en terminales diferentes. Cada instancia actuará como un usuario separado. Esta es la verdaera ventaja de tener el servidor y cliente separados.
+
+        \newpage
+        \subsection{Clases Launcher}
+
+            \subsubsection{LauncherServidor}
+            
+            La clase \textbf{LauncherServidor} inicia únicamente el servidor:
+
+            \vspace{0.3cm}
+            \begin{lstlisting}[caption={Clase LauncherServidor}]
+public class LauncherServidor {
+    public static void main(String[] args) {
+        System.out.println("=== INICIANDO SERVIDOR DE CHAT ===")
+        Servidor.main(args);
+    }
+}
+            \end{lstlisting}
+            
+            \subsubsection{Launcher}
+            
+            La clase \textbf{Launcher} inicia instancias del cliente:
+
+            \vspace{0.3cm}
+            \begin{lstlisting}[caption={Clase Launcher del Cliente}]
+public class Launcher {
+    public static void main(String[] args) {
+        Application.launch(App.class, args);
+    }
+}
+            \end{lstlisting}
+
+    % ========================== PROBLEMAS ==========================
+    \newpage
+    \section{Problemas Encontrados y Soluciones}
+
+        Durante el desarrollo del proyecto se enfrentaron diversos desafíos técnicos que requirieron soluciones específicas.
+
+        \subsection{Problema 1: Sincronización de Hilos}
+
+            \textbf{Descripción}: Inicialmente se utilizaba un \textbf{ArrayList} para almacenar los clientes, lo que causaba \textbf{ConcurrentModificationException} cuando múltiples hilos intentaban modificar la lista simultáneamente.
+
+            \vspace{0.3cm}
+            \textbf{Solución}: Se reemplazó el \textbf{ArrayList} por \textbf{ConcurrentHashMap.newKeySet()}, que es thread-safe y permite operaciones concurrentes sin sincronización explícita.
+
+        \subsection{Problema 2: Actualización de la Interfaz desde Hilos}
+
+            \textbf{Descripción}: Al intentar actualizar la interfaz JavaFX directamente desde el hilo de recepción de mensajes, se producían excepciones porque JavaFX requiere que todas las actualizaciones de UI se hagan desde el hilo de aplicación JavaFX.
+
+            \vspace{0.3cm}
+            \textbf{Solución}: Se utilizó \textbf{Platform.runLater()} para encolar las actualizaciones de interfaz en el hilo correcto:
+
+            \begin{center}
+                $Platform.runLater(() \rightarrow agregarMensaje(mensaje));$
+            \end{center}
+
+        \subsection{Problema 3: Cierre de Conexiones}
+
+            \textbf{Descripción}: Al cerrar una ventana de cliente, el servidor no siempre detectaba la desconexión inmediatamente, dejando referencias a clientes inactivos.
+
+            \vspace{0.3cm}
+            \textbf{Solución}: Se implementó un bloque \textbf{finally} en \textbf{HandlerCliente} que garantiza la limpieza de recursos:
+
+            \begin{lstlisting}
+finally {
+    Servidor.clientes.remove(this);
+    if (nombre != null) {
+        Servidor.broadcast(nombre + " se ha ido");
+    }
+    try {
+        socket.close();
+    } catch (IOException ignored) {
+    }
+}
+            \end{lstlisting}
+
+        \subsection{Problema 4: Mensajes Duplicados}
+
+            \textbf{Descripción}: Los clientes veían sus propios mensajes duplicados: uno al enviar y otro cuando el servidor los redistribuía.
+
+            \vspace{0.3cm}
+            \textbf{Solución}: Se implementó un filtro en \textbf{agregarMensaje()} que ignora los mensajes que comienzan con el nombre del cliente actual:
+
+            \begin{lstlisting}
+if (texto.startsWith("[" + nombreCliente.toUpperCase() + "]: ")) {
+    return;
+}
+            \end{lstlisting}
+
+        \subsection{Problema 5: Configuración del Puerto}
+
+            \textbf{Descripción}: En algunos sistemas, el puerto 8080 ya estaba en uso por otras aplicaciones (como servidores web de desarrollo).
+
+            \vspace{0.3cm}
+            \textbf{Solución}: Se documentó el puerto como constante configurable y se proporcionó información sobre cómo liberar puertos en el archivo \textbf{liberarPuertos.md}.
+
+        \subsection{Problema 6: Scroll Automático}
+
+            \textbf{Descripción}: Al recibir nuevos mensajes, el área de chat no se desplazaba automáticamente hacia abajo, obligando al usuario a hacer scroll manualmente.
+
+            \vspace{0.3cm}
+            \textbf{Solución}: Se añadió \textbf{chat.setVvalue(1.0)} después de agregar cada mensaje para posicionar el scroll al final automáticamente.
+
+        \subsection{Problema 7: Mensajes Propios Aparecen Dos Veces}
+
+            \textbf{Descripción}: Los mensajes enviados por el usuario aparecían duplicados: una vez como mensaje propio (alineado a la derecha) y otra vez como mensaje recibido del servidor (alineado a la izquierda). El problema radicaba en que el cliente agregaba el mensaje localmente y luego el servidor lo retransmitía a todos los clientes, incluyendo al emisor.
+
+            \vspace{0.3cm}
+            \textbf{Solución}: Se implementó un filtro en el método \textbf{agregarMensaje()} que detecta y descarta los mensajes propios cuando vienen del servidor. El filtro compara el prefijo del mensaje con el nombre del usuario en mayúsculas
+
+        \subsection{Problema 8: Formato Incorrecto en Mensajes de Otros Usuarios}
+
+            \textbf{Descripción}: Los mensajes de otros usuarios aparecían con el formato "juan: [JUAN]: mensaje", mostrando el nombre duplicado y en diferentes formatos. Esto ocurría porque el cliente enviaba el mensaje con formato "[NOMBRE]: mensaje" y luego el servidor añadía otro prefijo "nombre: ".
+
+            \vspace{0.3cm}
+            \textbf{Solución}: Se modificó el flujo de mensajes para que:
+            
+            \begin{enumerate}
+                \item El cliente envíe únicamente el texto del mensaje sin agregar su nombre
+                \item El servidor sea quien añada el nombre del remitente en mayúsculas
+                \item El formato final sea consistente: "NOMBRE: mensaje"
+            \end{enumerate}
+
+            \begin{lstlisting}[caption={Cambio en el cliente}]
+// Antes: salida.println("[" + nombreCliente + "]: " + msg);
+// Ahora: 
+salida.println(msg);  // Solo enviar el texto
+            \end{lstlisting}
+
+            \begin{lstlisting}[caption={Cambio en el servidor}]
+// El servidor formatea el mensaje:
+Servidor.broadcast(nombre.toUpperCase() + ": " + mensaje);
+            \end{lstlisting}
+
+        \subsection{Problema 9: Inicio Acoplado de Servidor y Cliente}
+
+            \textbf{Descripción}: Inicialmente, el servidor se iniciaba automáticamente con la primera instancia del cliente. Esto causaba problemas:
+            
+            \begin{itemize}
+                \item Imposibilidad de ejecutar el servidor en una máquina separada
+                \item Dificultad para depurar servidor y cliente de forma independiente
+                \item No se podía reiniciar el servidor sin cerrar todos los clientes
+                \item Complejidad innecesaria en el código del cliente
+            \end{itemize}
+
+            \vspace{0.3cm}
+            \textbf{Solución}: Se separó completamente el inicio del servidor y los clientes:
+            
+            \begin{enumerate}
+                \item Se creó \textbf{LauncherServidor.java} como punto de entrada exclusivo del servidor
+                \item Se eliminó la lógica de inicio automático del servidor en \textbf{App.java}
+                \item Se añadió validación de conexión que verifica que el servidor esté disponible
+                \item Se implementó mensaje de error informativo si el servidor no está ejecutándose
+            \end{enumerate}
+            
+            Esta arquitectura permite mayor flexibilidad y facilita el desarrollo, depuración y despliegue de la aplicación.
+
+    % ========================== CONCLUSIÓN ==========================
+    \newpage
+    \section{Conclusión}
+
+        El desarrollo de este sistema de chat multicliente ha permitido poner en práctica nuevos conceptos de programación concurrente y la creación de sockets.
+
+        \subsection{Objetivos Alcanzados}
+
+            \begin{itemize}
+                \item Se implementó un servidor robusto capaz de gestionar múltiples conexiones simultáneas mediante un pool de hilos.
+                \item Se desarrolló un cliente con interfaz gráfica utilizando JavaFX.
+                \item Se estableció un protocolo de comunicación basado en sockets TCP/IP.
+                \item Aplicación de conceptos de programación concurrente para garantizar la sincronización
+                \item Sistema de broadcast para la comunicación grupal.
+                \item Gestión adecuada de eventos durante el proceso de conexión, desconexión y envío de mensajes.
+            \end{itemize}
+
+        \subsection{Aprendizajes Tecnicos}
+
+            \begin{enumerate}
+                \item \textbf{Programacion concurrente}: Comprension profunda del uso de \textbf{ExecutorService} y gestion de hilos.
+
+                \item \textbf{Comunicacion en red}: Experiencia practica con sockets TCP/IP, flujos de entrada/salida y manejo de conexiones de red.
+            \end{enumerate}
+
+        \subsection{Posibles Mejoras Futuras}
+
+            Aunque el sistema cumple con los requisitos funcionales, existen oportunidades de mejora:
+
+            \begin{itemize}
+                \item \textbf{Persistencia de mensajes}: Almacenar el historial de chat en una base de datos
+                \item \textbf{Salas multiples}: Permitir crear y unirse a diferentes salas de chat
+                \item \textbf{Mensajes privados}: Implementar comunicacion directa entre dos usuarios
+                \item \textbf{Autenticacion}: Añadir sistema de registro e inicio de sesion
+                \item \textbf{Cifrado}: Implementar comunicacion segura mediante SSL/TLS
+                \item \textbf{Indicadores de estado}: Mostrar que usuarios estan escribiendo o conectados
+                \item \textbf{Compartir archivos}: Permitir el intercambio de imagenes y documentos
+                \item \textbf{Emojis y formato}: Anadir soporte para emoticonos y formato de texto
+            \end{itemize}
+
+    % ========================== BIBLIOGRAFÍA ==========================
+    \newpage
+    \section{Bibliografía}
+
+        \begin{itemize}
+            \item \textbf{Documentación oficial de Java}:
+            
+            \href{https://docs.oracle.com/en/java/javase/21/}{Oracle Java SE 21 Documentation}
+
+            \item \textbf{Socket Programming en Java}:
+            
+            \href{https://www.baeldung.com/a-guide-to-java-sockets}{Baeldung - Guide to Java Sockets}
+
+            \item \textbf{ExecutorService y Thread Pools}:
+            
+            \href{https://www.baeldung.com/java-executor-service-tutorial}{Baeldung - ExecutorService Tutorial}
+
+            \item \textbf{JavaFX FXML}:
+            
+            \href{https://openjfx.io/javadoc/21/javafx.fxml/javafx/fxml/doc-files/introduction_to_fxml.html}{Introduction to FXML}
+
+            \item \textbf{ConcurrentHashMap en Java}:
+            
+            \href{https://www.baeldung.com/java-concurrent-map}{Baeldung - ConcurrentHashMap Guide}
+
+            \item \textbf{Platform.runLater() en JavaFX}:
+            
+            \href{https://docs.oracle.com/javase/8/javafx/api/javafx/application/Platform.html}{JavaFX Platform API Documentation}
+
+            \item \textbf{TCP/IP Protocol}:
+            
+            \href{https://www.rfc-editor.org/rfc/rfc793}{RFC 793 - Transmission Control Protocol}
+
+            \item \textbf{Maven JavaFX Plugin}:
+            
+            \href{https://github.com/openjfx/javafx-maven-plugin}{OpenJFX Maven Plugin GitHub}
+
+        \end{itemize}
+
+\end{document}

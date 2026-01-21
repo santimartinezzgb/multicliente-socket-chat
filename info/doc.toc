@@ -1,0 +1,70 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Contexto del Proyecto}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Objetivos del Proyecto}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Tecnologías Utilizadas}{4}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Estructura de la Documentación}{4}{subsection.1.4}%
+\contentsline {section}{\numberline {2}Arquitectura del Sistema}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Visión General}{5}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Estructura de Paquetes}{5}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Diagrama de Componentes}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Principios de Diseño Aplicados}{6}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Separación de Responsabilidades}{6}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}Concurrencia Controlada}{6}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Modularidad}{6}{subsubsection.2.4.3}%
+\contentsline {section}{\numberline {3}Implementación del Servidor}{7}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Clase Servidor}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Características del Servidor}{8}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Puerto de Escucha}{8}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Gestión de Clientes}{8}{subsubsection.3.2.2}%
+\contentsline {subsubsection}{\numberline {3.2.3}Pool de Hilos}{8}{subsubsection.3.2.3}%
+\contentsline {subsubsection}{\numberline {3.2.4}Método Broadcast}{8}{subsubsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.3}Clase HandlerCliente}{9}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Ciclo de Vida de una Conexión}{10}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Implementación del Cliente}{11}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Clase App}{11}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Características del Cliente}{11}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Separación Servidor-Cliente}{11}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Validación de Conexión}{11}{subsubsection.4.2.2}%
+\contentsline {subsubsection}{\numberline {4.2.3}Diálogo de Identificación}{11}{subsubsection.4.2.3}%
+\contentsline {subsubsection}{\numberline {4.2.4}Carga de la Interfaz}{11}{subsubsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.3}Clase MainController}{12}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Gestión de Mensajes}{13}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}Envío de Mensajes}{13}{subsubsection.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.2}Recepción de Mensajes}{13}{subsubsection.4.4.2}%
+\contentsline {section}{\numberline {5}Protocolo de Comunicación}{14}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Formato de Mensajes}{14}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Flujo de Comunicación}{14}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Diagrama de Secuencia}{14}{subsection.5.3}%
+\contentsline {section}{\numberline {6}Interfaz de Usuario}{15}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Componentes de la Interfaz}{18}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Archivo FXML}{18}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Estilos CSS}{18}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Métodos de Visualización}{18}{subsection.6.4}%
+\contentsline {subsubsection}{\numberline {6.4.1}Agregar Mensaje Propio}{18}{subsubsection.6.4.1}%
+\contentsline {subsubsection}{\numberline {6.4.2}Agregar Mensaje Recibido}{19}{subsubsection.6.4.2}%
+\contentsline {section}{\numberline {7}Compilación y Ejecución}{20}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Estructura del POM}{20}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Comandos de Ejecución}{20}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}Compilar el Proyecto}{20}{subsubsection.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.2}Ejecutar el Servidor}{20}{subsubsection.7.2.2}%
+\contentsline {subsubsection}{\numberline {7.2.3}Ejecutar Clientes}{20}{subsubsection.7.2.3}%
+\contentsline {subsubsection}{\numberline {7.2.4}Ejecutar Múltiples Instancias}{20}{subsubsection.7.2.4}%
+\contentsline {subsection}{\numberline {7.3}Clases Launcher}{21}{subsection.7.3}%
+\contentsline {subsubsection}{\numberline {7.3.1}LauncherServidor}{21}{subsubsection.7.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.2}Launcher}{21}{subsubsection.7.3.2}%
+\contentsline {section}{\numberline {8}Problemas Encontrados y Soluciones}{22}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Problema 1: Sincronización de Hilos}{22}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Problema 2: Actualización de la Interfaz desde Hilos}{22}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Problema 3: Cierre de Conexiones}{22}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}Problema 4: Mensajes Duplicados}{22}{subsection.8.4}%
+\contentsline {subsection}{\numberline {8.5}Problema 5: Configuración del Puerto}{23}{subsection.8.5}%
+\contentsline {subsection}{\numberline {8.6}Problema 6: Scroll Automático}{23}{subsection.8.6}%
+\contentsline {subsection}{\numberline {8.7}Problema 7: Mensajes Propios Aparecen Dos Veces}{23}{subsection.8.7}%
+\contentsline {subsection}{\numberline {8.8}Problema 8: Formato Incorrecto en Mensajes de Otros Usuarios}{23}{subsection.8.8}%
+\contentsline {subsection}{\numberline {8.9}Problema 9: Inicio Acoplado de Servidor y Cliente}{24}{subsection.8.9}%
+\contentsline {section}{\numberline {9}Conclusión}{25}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Objetivos Alcanzados}{25}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Aprendizajes Tecnicos}{25}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Posibles Mejoras Futuras}{25}{subsection.9.3}%
+\contentsline {section}{\numberline {10}Bibliografía}{26}{section.10}%
