@@ -11,7 +11,6 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        // Iniciar el servidor
         Thread serverThread = new Thread(() -> {
             com.chat.chatmulticlithreads.servicios.Servidor.main(null);
         });

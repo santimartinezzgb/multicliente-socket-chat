@@ -19,7 +19,7 @@
 
         <HBox spacing="10" alignment="CENTER">
             <Label text="GESTIÓN DE CLIENTES" styleClass="titulo_control"/>
-            <Button fx:id="boton_reiniciar" text="↺ "/>
+            <Button fx:id="boton_reiniciar" text="↺ " onAction="#reiniciarDatos"/>
         </HBox>
         
         <VBox spacing="8">
@@ -36,7 +36,6 @@
         
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" styleClass="panel_scroll">
             <VBox fx:id="lista_clientes" spacing="10">
-                <!-- Tarjetas de control de clientes se añadirán aquí -->
             </VBox>
         </ScrollPane>
     </VBox>
@@ -51,7 +50,6 @@
 
         <ScrollPane fx:id="chat" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
             <VBox fx:id="contenedor_chat_cuerpo" spacing="10">
-                <!-- Los mensajes se cargarán dinámicamente -->
             </VBox>
         </ScrollPane>
     </VBox>

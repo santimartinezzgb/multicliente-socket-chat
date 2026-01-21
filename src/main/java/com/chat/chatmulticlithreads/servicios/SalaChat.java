@@ -15,29 +15,24 @@ public class SalaChat {
         return nombre;
     }
 
-    // Entrar a la sala
     public void entrarSala(HandlerCliente manejador) {
         participantes.add(manejador);
     }
 
-    // Salir de la sala
     public void abandonarSala(HandlerCliente manejador) {
         participantes.remove(manejador);
     }
 
-    // Obtener el tamaño de la sala
     public int getSize() {
         return participantes.size();
     }
 
-    // Enviar mensaje a todos los participantes
     public void enviarMensajeTodos(String mensaje) {
         for (HandlerCliente p : participantes) {
             p.enviar(mensaje);
         }
     }
 
-    // Enviar mensaje a todos menos a quien lo envía
     public void enviarMensajeMenosOrigen(HandlerCliente origen, String mensaje) {
         for (HandlerCliente p : participantes) {
             if (p != origen) {

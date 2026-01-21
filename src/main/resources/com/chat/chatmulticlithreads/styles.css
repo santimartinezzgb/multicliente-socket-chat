@@ -1,11 +1,10 @@
-/* --- ESTILOS GLOBALES --- */
 .root {
     -fx-font-family: "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
     -fx-font-size: 14px;
     -fx-background-color: #ffffff;
 }
 
-/* --- PANEL IZQUIERDO --- */
+/* ========== PANEL IZQUIERDO ========== */
 #panel_control {
     -fx-background-color: #f3f4f6;
     -fx-padding: 20;
@@ -54,7 +53,6 @@
 
 #button_conectar:hover {
     -fx-background-color: #065f46;
-    /* Slightly darker green */
 }
 
 .label_conectados {
@@ -68,7 +66,6 @@
     -fx-padding: 0;
 }
 
-/* Tarjeta de cliente */
 .tarjeta_cliente {
     -fx-background-color: white;
     -fx-background-radius: 8;
@@ -109,7 +106,7 @@
     -fx-border-radius: 4;
 }
 
-/* --- PANEL DERECHO: Chat General --- */
+/* ============ PANEL DERECHO: Chat General =========== */
 #panel_chat_general {
     -fx-background-color: white;
 }

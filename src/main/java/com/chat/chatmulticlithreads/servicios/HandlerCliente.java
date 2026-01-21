@@ -7,6 +7,13 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * - Maneja la comunicación con un cliente específico en la sala de chat.
+ * - Permite recibir mensajes del cliente y enviar mensajes a todos los clientes
+ * en la sala.
+ * - Cada instancia de esta clase se ejecuta en su propio hilo.
+ */
+
 public class HandlerCliente implements Runnable {
     private final Socket socket;
     private final int numeroCliente;
@@ -29,25 +36,29 @@ public class HandlerCliente implements Runnable {
 
         try (
 
-            BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter salida = new PrintWriter(socket.getOutputStream(), true)) {
+                BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter salida = new PrintWriter(socket.getOutputStream(), true)) {
 
             this.salida = salida;
             salida.println("Bienvenid@s a la sala: " + sala.getNombre());
 
             String linea = entrada.readLine();
-            if (linea == null || linea.trim().isEmpty()) linea = "Cliente" + numeroCliente;
+            if (linea == null || linea.trim().isEmpty())
+                linea = "Cliente" + numeroCliente;
             nombre = linea.trim();
 
             sala.entrarSala(this);
             sala.enviarMensajeTodos("'" + nombre + "' se ha unido al chat.");
-            sala.enviarMensajeTodos("[SYSTEM_COUNT]: " + sala.getSize());
 
             String mensaje;
             while ((mensaje = entrada.readLine()) != null) {
                 String m = mensaje.trim();
-                if (m.isEmpty()) continue;
-                if (m.equalsIgnoreCase(palabraSalida)) { salida.println(nombre.toUpperCase() + mensajeSalida); break; }
+                if (m.isEmpty())
+                    continue;
+                if (m.equalsIgnoreCase(palabraSalida)) {
+                    salida.println(nombre.toUpperCase() + mensajeSalida);
+                    break;
+                }
                 sala.enviarMensajeTodos(m);
             }
 
@@ -60,23 +71,25 @@ public class HandlerCliente implements Runnable {
 
     public void enviar(String mensaje) {
         PrintWriter salidaActual = this.salida;
-        if (salidaActual != null) salidaActual.println(mensaje);
-        
+        if (salidaActual != null)
+            salidaActual.println(mensaje);
     }
 
     private void limpiar() {
-        if (!enEjecucion.compareAndSet(true, false)) return;
+        if (!enEjecucion.compareAndSet(true, false))
+            return;
 
         sala.abandonarSala(this);
 
         if (nombre != null) {
             String msgSalida = nombre.toUpperCase() + " ha abandonado la sala.";
             sala.enviarMensajeTodos(msgSalida);
-            sala.enviarMensajeTodos("[SYSTEM_COUNT]: " + sala.getSize());
         }
         try {
             socket.close();
-        } catch (IOException ignored) { System.err.println("Error al cerrar el socket del cliente #" + numeroCliente); }
+        } catch (IOException ignored) {
+            System.err.println("Error al cerrar el socket del cliente #" + numeroCliente);
+        }
 
         System.out.println("Cliente #" + numeroCliente + " desconectado");
     }

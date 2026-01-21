@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-
+import com.chat.chatmulticlithreads.servicios.SesionCliente;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -18,6 +18,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+/**
+ * Controlador principal de la aplicación.
+ * - Gestiona la interfaz gráfica y la interacción del usuario.
+ * - Permite conectar nuevos clientes, enviar mensajes y reiniciar la sesión.
+ * - Mantiene una lista de sesiones activas y actualiza la interfaz en
+ * consecuencia.
+ */
+
 public class MainController {
     @FXML
     private VBox contenedor_chat_cuerpo;
@@ -27,8 +35,6 @@ public class MainController {
     private TextField input_nuevo_nombre;
     @FXML
     private ScrollPane chat;
-    @FXML
-    private Label label_titulo_chat;
 
     private final List<SesionCliente> sesionesActivas = new ArrayList<>();
     private final String HOST = "localhost";
@@ -55,7 +61,7 @@ public class MainController {
             // Usar un único hilo de escucha compartido para el chat general
             if (socketEscuchaCompartido == null || socketEscuchaCompartido.isClosed()) {
                 socketEscuchaCompartido = socket;
-                iniciarEscuchaCompartida();
+                iniciarHiloEscucha(socket);
             }
 
             crearTarjetaCliente(sesion);
@@ -68,34 +74,17 @@ public class MainController {
         }
     }
 
-    private void iniciarEscuchaCompartida() {
-        if (socketEscuchaCompartido == null) return;
-
-        new Thread(() -> {
-            try (BufferedReader entrada = new BufferedReader(new InputStreamReader(socketEscuchaCompartido.getInputStream()))) {
-                String linea;
-                while ((linea = entrada.readLine()) != null) {
-                    final String msg = linea;
-                    Platform.runLater(() -> {
-                        if (msg.startsWith("[SYSTEM_COUNT]: ")) {
-                            try {
-                                String count = msg.replace("[SYSTEM_COUNT]: ", "").trim();
-                                label_titulo_chat.setText("Sala General (" + count + " en línea)");
-                            } catch (Exception ignored) {
-                            }
-                        } else {
-                            agregarMensaje(msg);
-                            chat.setVvalue(1.0);
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                // Conexión cerrada o error en el socket compartido
-            } finally {
-                // Marcar que el socket compartido se cerró
-                socketEscuchaCompartido = null;
+    @FXML
+    private void reiniciarDatos() {
+        for (SesionCliente sesion : sesionesActivas) {
+            try {
+                sesion.getSocket().close();
+            } catch (IOException ignored) {
             }
-        }, "Escucha-Compartida").start();
+        }
+        sesionesActivas.clear();
+        actualizarListaClientes();
+        contenedor_chat_cuerpo.getChildren().clear();
     }
 
     private void crearTarjetaCliente(SesionCliente sesion) {
@@ -120,7 +109,6 @@ public class MainController {
         TextField campoEntrada = new TextField();
         campoEntrada.setPromptText("Mensaje...");
         campoEntrada.getStyleClass().add("campo_entrada");
-        HBox.setHgrow(campoEntrada, javafx.scene.layout.Priority.ALWAYS);
 
         // Crear el boton de enviar
         Button botonEnviar = new Button("Enviar");
@@ -163,7 +151,6 @@ public class MainController {
 
     }
 
-
     private void actualizarListaClientes() {
         Platform.runLater(() -> {
             lista_clientes.getChildren().clear();
@@ -178,6 +165,24 @@ public class MainController {
         });
     }
 
+    private void iniciarHiloEscucha(Socket socket) {
+        Thread hiloEscucha = new Thread(() -> {
+            try (BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+                String mensaje;
+                while ((mensaje = entrada.readLine()) != null) {
+                    String mensajeFinal = mensaje;
+                    Platform.runLater(() -> agregarMensaje(mensajeFinal));
+                }
+            } catch (IOException e) {
+                System.err.println("Error en el hilo de escucha compartido: " + e.getMessage());
+            }
+        });
+
+        hiloEscucha.setDaemon(true);
+        hiloEscucha.start();
+
+    }
+
     private void agregarMensaje(String texto) {
 
         // Crear el contenedor del mensaje
@@ -190,8 +195,6 @@ public class MainController {
 
         // Agregar el label al contenedor
         contenedorMensaje.getChildren().add(label);
-
-        // Agregar el contenedor al cuerpo del chat
         contenedor_chat_cuerpo.getChildren().add(contenedorMensaje);
     }
 
@@ -203,38 +206,4 @@ public class MainController {
         alert.showAndWait();
     }
 
-    // Clase interna para gestionar la sesión de cada cliente local
-    private static class SesionCliente {
-        private final String nombre;
-        private final PrintWriter salida;
-        private final Socket socket;
-        private VBox tarjeta;
-
-        public SesionCliente(String nombre, PrintWriter salida, VBox tarjeta, Socket socket) {
-            this.nombre = nombre;
-            this.salida = salida;
-            this.tarjeta = tarjeta;
-            this.socket = socket;
-        }
-
-        public String getNombre() {
-            return nombre;
-        }
-
-        public PrintWriter getSalida() {
-            return salida;
-        }
-
-        public VBox getTarjeta() {
-            return tarjeta;
-        }
-
-        public void setTarjeta(VBox tarjeta) {
-            this.tarjeta = tarjeta;
-        }
-
-        public Socket getSocket() {
-            return socket;
-        }
-    }
 }
