@@ -25,8 +25,8 @@ public class HandlerCliente implements Runnable {
             if (nombre == null || nombre.isEmpty())
                 nombre = "Usuario";
 
-            Servidor.clientes.add(this);
-            Servidor.broadcast(nombre + " se ha unido");
+            Servidor.clientes.add(this); // Agregar el cliente a la lista
+            Servidor.broadcast(nombre + " se ha unido"); // Notificar a todos los clientes
 
             String mensaje;
             while ((mensaje = entrada.readLine()) != null) {
@@ -35,7 +35,7 @@ public class HandlerCliente implements Runnable {
                 Servidor.broadcast(nombre.toUpperCase() + ": " + mensaje);
             }
         } catch (IOException e) {
-            // Cliente desconectado
+
         } finally {
             Servidor.clientes.remove(this);
             if (nombre != null) {

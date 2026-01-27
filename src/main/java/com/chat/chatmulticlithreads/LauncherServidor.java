@@ -4,7 +4,7 @@ import com.chat.chatmulticlithreads.servicios.Servidor;
 
 /**
  * Launcher exclusivo para el servidor.
- * Ejecuta este programa primero para iniciar el servidor de chat.
+ * INICIAR ANTES DE CLIENTES
  */
 public class LauncherServidor {
 	public static void main(String[] args) {
