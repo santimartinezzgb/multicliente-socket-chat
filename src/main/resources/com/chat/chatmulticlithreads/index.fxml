@@ -20,6 +20,8 @@
             <Insets top="15" right="15" bottom="15" left="15"/>
         </padding>
         <Label fx:id="label_titulo_chat" text="Chat General" styleClass="chat_title"/>
+        <Button text="Unirse" onAction="#unirseGrupo"/>
+        <Button text="Crear" onAction="#crearGrupo"/>
     </HBox>
 
     <!-- Área de Mensajes -->

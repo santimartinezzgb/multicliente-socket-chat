@@ -3,6 +3,7 @@ package com.chat.chatmulticlithreads.servicios;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -10,7 +11,8 @@ import java.util.concurrent.Executors;
 
 public class Servidor {
     private static final int PUERTO = 8080;
-    public static final Set<HandlerCliente> clientes = ConcurrentHashMap.newKeySet();
+    public static final Set<HandlerCliente> clientes = ConcurrentHashMap.newKeySet(); // LISTA CLIENTE
+    public static ArrayList<Grupo> grupos = new ArrayList<>(); // LISTA GRUPOS
 
     public static void main(String[] args) {
         ExecutorService pool = Executors.newCachedThreadPool();
@@ -30,4 +32,5 @@ public class Servidor {
     public static void broadcast(String mensaje) {
         clientes.forEach(c -> c.enviar(mensaje));
     }
+
 }

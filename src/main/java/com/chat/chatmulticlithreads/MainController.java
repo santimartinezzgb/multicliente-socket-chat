@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Objects;
 
+import com.chat.chatmulticlithreads.servicios.Grupo;
+import com.chat.chatmulticlithreads.servicios.Servidor;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -100,6 +103,16 @@ public class MainController {
 
         contenedor_chat_cuerpo.getChildren().add(contenedor); // Agregar al contenedor principal
         chat.setVvalue(1.0); // Desplazar al final del chat
+    }
+
+    public void crearGrupo() {
+        Grupo nuevoGrupo = new Grupo("nuevo");
+        Servidor.grupos.add(nuevoGrupo);
+        label_titulo_chat.setText(nuevoGrupo.nombre);
+    }
+    public void unirseGrupo() {;
+        salida.println(Servidor.grupos.get(1).nombre);
+        System.out.println(Servidor.grupos.get(1).nombre);
     }
 
     public void desconectar() {

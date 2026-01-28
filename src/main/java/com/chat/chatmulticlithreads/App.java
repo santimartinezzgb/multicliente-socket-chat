@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 
@@ -13,6 +14,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
+        // INICIAR CON USUARIO
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Chat");
         dialog.setContentText("Tu nombre:");
